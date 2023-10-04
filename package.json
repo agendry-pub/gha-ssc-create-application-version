@@ -4,18 +4,18 @@
   "version": "1.0.1",
   "author": "Alex Gendry",
   "private": false,
-  "homepage": "https://github.com/actions/typescript-action",
+  "homepage": "https://github.com/agendry-pub/gha-ssc-create-application-version",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
+    "url": "git+https://github.com/agendry-pub/gha-ssc-create-application-version.git"
   },
   "bugs": {
-    "url": "https://github.com/actions/typescript-action/issues"
+    "url": "https://github.com/agendry-pub/gha-ssc-create-application-version/issues"
   },
   "keywords": [
     "actions",
-    "node",
-    "setup"
+    "fortify",
+    "ssc"
   ],
   "exports": {
     ".": "./dist/index.js"

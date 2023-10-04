@@ -4,7 +4,7 @@ author: 'Alex Gendry @ OpenText'
 
 # Define your inputs here.
 inputs:
-      ssc_url:
+      ssc_base_url:
         description: 'Fortify SSC URL'
         required: true
       ssc_ci_username:
@@ -13,11 +13,8 @@ inputs:
       ssc_ci_password:
         description: 'Fortify SSC CI Acount password'
         required: false
-      ssc_ci_token_dec:
-        description: 'Fortify SSC Decrypted CI Token (CIToken)'
-        required: false
-      ssc_ci_token_enc:
-        description: 'Fortify SSC Encrypted CI Token (CIToken)'
+      ssc_ci_token:
+        description: 'Fortify SSC Decrypted or Encrypted CI Token (CIToken)'
         required: false
       ssc_app:
         description: 'Fortify SSC Application Name'

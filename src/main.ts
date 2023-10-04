@@ -7,7 +7,8 @@ import {
 } from './bodies'
 
 const INPUT = {
-  ssc_url: core.getInput('ssc_url', { required: true }),
+  ssc_base_url: core.getInput('ssc_base_url', { required: true }),
+  ssc_ci_token: core.getInput('ssc_ci_token', { required: false }),
   ssc_ci_username: core.getInput('ssc_ci_username', { required: false }),
   ssc_ci_password: core.getInput('ssc_ci_password', { required: false }),
   ssc_app: core.getInput('ssc_app', { required: true }),
@@ -16,6 +17,116 @@ const INPUT = {
   ssc_source_version: core.getInput('ssc_source_version', { required: false }),
   copy_vulns: core.getBooleanInput('copy_vulns', { required: false }),
   sha: core.getInput('sha', { required: false })
+}
+
+async function loginToken(base_url: string, token: string): Promise<any> {
+  let responseData = ''
+  let errorData = ''
+
+  const options = {
+    listeners: {
+      stdout: (data: Buffer) => {
+        responseData += data.toString()
+      },
+      stderr: (data: Buffer) => {
+        errorData += data.toString()
+      }
+    },
+    silent: true
+  }
+
+  try {
+    const response = await exec.exec(
+      'fcli',
+      [
+        'ssc',
+        'session',
+        'login',
+        `--url`,
+        base_url,
+        '-t',
+        token,
+        process.env.FCLI_DEFAULT_TOKEN_EXPIRE
+          ? `--expire-in=${process.env.FCLI_DEFAULT_TOKEN_EXPIRE}`
+          : '',
+        '--output=json'
+      ],
+      options
+    )
+    core.debug(response.toString())
+    core.debug(responseData)
+
+    const jsonRes = JSON.parse(responseData)
+
+    if (jsonRes['__action__'] === 'CREATED') {
+      return jsonRes
+    } else {
+      throw new Error(
+        `Login Failed: SSC returned __action__ = ${jsonRes['__action__']}`
+      )
+    }
+  } catch (err) {
+    core.error(errorData)
+    throw new Error(`${err}`)
+  }
+}
+
+async function loginUsernamePassword(
+  base_url: string,
+  username: string,
+  password: string
+): Promise<any> {
+  let responseData = ''
+  let errorData = ''
+
+  const options = {
+    listeners: {
+      stdout: (data: Buffer) => {
+        responseData += data.toString()
+      },
+      stderr: (data: Buffer) => {
+        errorData += data.toString()
+      }
+    },
+    silent: true
+  }
+  try {
+    const response = await exec.exec(
+      'fcli',
+      [
+        'ssc',
+        'session',
+        'login',
+        `--url`,
+        base_url,
+        '-u',
+        username,
+        '-p',
+        password,
+        '--expire-in',
+        process.env.FCLI_DEFAULT_TOKEN_EXPIRE
+          ? process.env.FCLI_DEFAULT_TOKEN_EXPIRE
+          : '1d',
+        '--output=json'
+      ],
+      options
+    )
+    core.debug(response.toString())
+    core.debug(responseData)
+
+    const jsonRes = JSON.parse(responseData)
+
+    if (jsonRes['__action__'] === 'CREATED') {
+      return jsonRes
+    } else {
+      throw new Error(
+        `Login Failed: SSC returned __action__ = ${jsonRes['__action__']}`
+      )
+    }
+  } catch (err) {
+    core.error(errorData)
+    throw new Error(`${err}`)
+  }
 }
 
 async function getAppVersionId(app: string, version: string): Promise<number> {
@@ -373,10 +484,26 @@ async function commitAppVersion(id: string): Promise<any> {
 export async function run(): Promise<void> {
   try {
     /** Login  */
-    core.info(`Login to Fortify Software Security Center`)
-    await exec.exec(
-      `fcli ssc session login --url ${INPUT.ssc_url} -u ${INPUT.ssc_ci_username} -p ${INPUT.ssc_ci_password}`
-    )
+    try {
+      core.info(`Login to Fortify Software Security Center`)
+      if (INPUT.ssc_ci_token) {
+        await loginToken(INPUT.ssc_base_url, INPUT.ssc_ci_token)
+      } else if (INPUT.ssc_ci_username && INPUT.ssc_ci_password) {
+        await loginUsernamePassword(
+          INPUT.ssc_base_url,
+          INPUT.ssc_ci_username,
+          INPUT.ssc_ci_password
+        )
+      } else {
+        core.setFailed(
+          'Missing credentials. Specify CI Token or Username+Password'
+        )
+        throw new Error('Credentials missing')
+      }
+    } catch (err) {
+      core.setFailed(`${err}`)
+      throw new Error('Login failed!')
+    }
 
     /** Is AppVersion already created ? */
     core.info(
