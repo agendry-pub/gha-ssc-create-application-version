@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.0](https://www.github.com/agendry-pub/gha-ssc-create-application-version/compare/v1.0.1...v1.1.0) (2023-10-04)
+
+
+### Features
+
+* ssc_url changed to ssc_base_url ([0e12e14](https://www.github.com/agendry-pub/gha-ssc-create-application-version/commit/0e12e141d4cd12a902d075b7ab648a8dad60143d))
+* token login added ([0e12e14](https://www.github.com/agendry-pub/gha-ssc-create-application-version/commit/0e12e141d4cd12a902d075b7ab648a8dad60143d))
+
 ### [1.0.1](https://www.github.com/agendry-pub/gha-ssc-create-application-version/compare/v1.0.0...v1.0.1) (2023-10-04)
 
 
