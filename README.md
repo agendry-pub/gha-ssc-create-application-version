@@ -67,8 +67,7 @@ jobs:
         uses: agendry-pub/gha-ssc-create-application-version@v1
         with:
           ssc_url: ${{ vars.FTFY_SSC_URL}}
-          ssc_ci_username: ${{ secrets.FTFY_CI_USERNAME }}
-          ssc_ci_password: ${{ secrets.FTFY_CI_PASSWORD }}
+          ssc_ci_token: ${{ secrets.FTFY_CI_TOKEN_DEC }}
           ssc_app: ${{ github.event.repository.name }}
           ssc_version: ${{ github.ref_name }}
       
@@ -76,7 +75,8 @@ jobs:
 
 #### SSC Considerations
 
-* Username and Password are required to copy the application version state from another one
+* FCLI supports Fortify Token in Decoded and Encoded format
+* Username and Password are required to copy the application version state from another one. The CI Token does not have the required permissions. Unified Login Token is the only type of token, but has a maximum expiration of 1 day
 
 #### Create Application Version with Copy State and Vulns
 
@@ -118,8 +118,8 @@ jobs:
 **`ssc_url`**  
 *Required* The base URL for the Fortify Software Security Center instance where your data resides.
 
-**`ssc_ci_username` + `ssc_ci_password`**  
-*Required* Credentials for authenticating to Software Security Center. Strongly recommend use of GitHub Secrets for credential management.
+**`ssc_ci_token` OR `ssc_ci_username` + `ssc_ci_password`**  
+*Required* Credentials for authenticating to Software Security Center. If both methods provided, the Action will choose the Token. Strongly recommend use of GitHub Secrets for credential management.
 
 **`ssc_app`**  
 *Required* The target SSC application name to create
@@ -136,13 +136,10 @@ jobs:
 **`copy_vulns`**  
 *Optional* Enable to copy vulnerabilities from source to target application version
 
-**`export_target`**  
-*Optional* Output format or system to export to. This input parameter is ignored if the `export_config` input parameter is defined. This input parameter supports any of the export targets for which a corresponding `SSCTo<export_target>.yml` is shipped with FortifyVulnerabilityExporter. The value of the `export_target` input parameter is case-sensitive when running on a platform with case-sensitive file names. Based on the FortifyVulnerabilityExporter version available at the time of writing, the following export targets are supported:
-
 ## Information for Developers
 
-All commits to the `main` or `master` branch should follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) convention. In particular, commits using the `feat: Some feature` and `fix: Some fix` convention are used to automatically manage version numbers and for updating the [CHANGELOG.md](https://github.com/fortify/gha-export-vulnerabilities/blob/master/CHANGELOG.md) file.
+All commits to the `main` branch should follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) convention. In particular, commits using the `feat: Some feature` and `fix: Some fix` convention are used to automatically manage version numbers and for updating the [CHANGELOG.md](https://github.com/fortify/gha-export-vulnerabilities/blob/master/CHANGELOG.md) file.
 
-Whenever changes are pushed to the `main` branch, the [`.github/workflows/publish-release.yml`](https://github.com/fortify/ghassc-create-application-version/blob/main/.github/workflows/publish-release.yml) workflow will be triggered. If there have been any commits with the `feat:` or `fix:` prefixes, the [`release-please-action`](https://github.com/google-github-actions/release-please-action) will generate a pull request with the appropriate changes to the CHANGELOG.md file and version number in `package.json`. If there is already an existing pull request, based on earlier feature or fix commits, the pull request will be updated.
+Whenever changes are pushed to the `main` branch, the [`.github/workflows/publish-release.yml`](https://github.com/fortify/gha-ssc-create-application-version/blob/main/.github/workflows/publish-release.yml) workflow will be triggered. If there have been any commits with the `feat:` or `fix:` prefixes, the [`release-please-action`](https://github.com/google-github-actions/release-please-action) will generate a pull request with the appropriate changes to the CHANGELOG.md file and version number in `package.json`. If there is already an existing pull request, based on earlier feature or fix commits, the pull request will be updated.
 
 Once the pull request is accepted, the `release-please-action` will publish the new release to the GitHub Releases page and tag it with the appropriate `v{major}.{minor}.{patch}` tag. The two `richardsimko/update-tag` action instances referenced in the `publish-release.yml` workflow will create or update the appropriate `v{major}.{minor}` and `v{major}` tags, allowing users to reference the action by major, minor or patch version.
