@@ -8,19 +8,13 @@ The Action can copy the Application State and the Values from another Applicatio
 ## Table of Contents
 
 * [Requirements](#requirements)
-    * [FoD or SSC instance](#fod-or-ssc-instance)
+    * [SSC instance](#ssc-instance)
     * [Network connectivity](#network-connectivity)
-    * [Java](#java)
+    * [fcli](#fcli)
 * [Usage](#usage)
-    * [Export FoD vulnerability data](#export-fod-vulnerability-data)
-        * [FoD to GitHub Code Scanning Alerts](#fod-to-github-code-scanning-alerts)
-        * [FoD to other output formats](#fod-to-other-output-formats)
-        * [FoD Inputs](#fod-inputs)
-    * [Export SSC vulnerability data](#export-ssc-vulnerability-data)
-        * [SSC to GitHub Code Scanning Alerts](#ssc-to-github-code-scanning-alerts)
-        * [SSC to other output formats](#ssc-to-other-output-formats)
+    * [Create Application Version](#create-application-version)
+        * [Create Application Version with Copy State and Vulns](#create-application-version-with-copy-state-and-vulns)
         * [SSC Inputs](#ssc-inputs)
-* [Docker-based alternative](#docker-based-alternative)
 * [Information for Developers](#information-for-developers)
 
 ## Requirements
@@ -36,9 +30,20 @@ The SSC instance in which you want to create an Application Version needs to be 
 | SSC    | GitHub-hosted | GitHub lists [IP addresses for GitHub-hosted runners](https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#ip-addresses) that need to be allowed network access to SSC. Exposing an SSC instance to the internet, even if limited to only GitHub IP addresses, could pose a security risk. |
 | SSC    | Self-hosted   | May need to allow network access from the self-hosted runner to SSC if in different network segments |
 
+### fcli
+
+This action uses [fcli](https://github.com/fortify/fcli) for most of its call to Software Security Center. Either use the [OpenText Official Docker Image](https://hub.docker.com/r/fortifydocker/fortify-ci-tools): `
+fortifydocker/fortify-ci-tools`. Or download the cli in you jobs:
+
+```bash
+  - name: Download fcli
+    run: |
+      wget -qO- https://github.com/fortify/fcli/releases/download/v1.3.1/fcli-linux.tgz | tar zxf -  
+```
+
 ## Usage
 
-The primary use case for this action is before the executioo of a Fortify scan. See the [Fortify ScanCentral Scan](https://github.com/marketplace/actions/fortify-scancentral-scan) action for more details on how to initiate SAST scans on Fortify ScanCentral SAST. 
+The primary use case for this action is before the execution of a Fortify scan. See the [Fortify ScanCentral Scan](https://github.com/marketplace/actions/fortify-scancentral-scan) action for more details on how to initiate SAST scans on Fortify ScanCentral SAST. 
 
 
 ### Create Application Version
