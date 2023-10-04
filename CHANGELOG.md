@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.0.1](https://www.github.com/agendry-pub/gha-ssc-create-application-version/compare/v1.0.0...v1.0.1) (2023-10-04)
+
+
+### Bug Fixes
+
+* release name correctly set ([a7e4fbf](https://www.github.com/agendry-pub/gha-ssc-create-application-version/commit/a7e4fbf7efbe752744ffe0e5e6095596203bffff))
+
 ## 1.0.0 (2023-10-04)
 
 
