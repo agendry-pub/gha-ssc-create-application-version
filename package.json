@@ -1,9 +1,9 @@
 {
-  "name": "typescript-action",
-  "description": "GitHub Actions TypeScript template",
+  "name": "gha-ssc-create-application-version",
+  "description": "GitHub Actions to create Application Version in SSC",
   "version": "1.0.0",
-  "author": "",
-  "private": true,
+  "author": "Alex Gendry",
+  "private": false,
   "homepage": "https://github.com/actions/typescript-action",
   "repository": {
     "type": "git",

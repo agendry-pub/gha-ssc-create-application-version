@@ -42,11 +42,10 @@ inputs:
         default: ${{ github.run_id }}
         required: false
 
-# Define your outputs here.
-outputs:
-  time:
-    description: 'Your output description here'
-
 runs:
   using: node20
   main: dist/index.js
+
+branding:
+  icon: 'shield'
+  color: 'blue'
