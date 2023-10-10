@@ -63,7 +63,7 @@ jobs:
       image: fortifydocker/fortify-ci-tools
 
     steps:
-      # Pull SAST issues from Fortify on Demand and generate GitHub-optimized SARIF output
+      # GitHub Action for Application Version creation
       - name: Create Application Version
         uses: agendry-pub/gha-ssc-create-application-version@v1
         with:
@@ -95,7 +95,7 @@ jobs:
       image: fortifydocker/fortify-ci-tools
 
     steps:
-      # Pull SAST issues from Fortify on Demand and generate GitHub-optimized SARIF output
+      # GitHub Action for Application Version creation
       - name: Create Application Version
         uses: agendry-pub/gha-ssc-create-application-version@v1
         with:
