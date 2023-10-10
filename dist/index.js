@@ -4097,6 +4097,38 @@ const INPUT = {
     copy_vulns: core.getBooleanInput('copy_vulns', { required: false }),
     sha: core.getInput('sha', { required: false })
 };
+async function checkLoggedIn(base_url) {
+    let responseData = '';
+    let errorData = '';
+    const options = {
+        listeners: {
+            stdout: (data) => {
+                responseData += data.toString();
+            },
+            stderr: (data) => {
+                errorData += data.toString();
+            }
+        },
+        silent: true
+    };
+    try {
+        const response = await exec.exec('fcli', ['ssc', 'session', 'list', '--query=name=default', '--output=json'], options);
+        core.debug(response.toString());
+        core.debug(responseData);
+        const jsonRes = JSON.parse(responseData);
+        if (jsonRes.length > 0) {
+            if (jsonRes[0]['expired'] === 'No') {
+                return true;
+            }
+        }
+        return false;
+    }
+    catch (err) {
+        core.error('Failed to check existing SSC sessions');
+        core.error(errorData);
+        throw new Error(`${err}`);
+    }
+}
 async function loginToken(base_url, token) {
     let responseData = '';
     let errorData = '';
@@ -4488,9 +4520,12 @@ async function run() {
             else if (INPUT.ssc_ci_username && INPUT.ssc_ci_password) {
                 await loginUsernamePassword(INPUT.ssc_base_url, INPUT.ssc_ci_username, INPUT.ssc_ci_password);
             }
+            else if (await checkLoggedIn(INPUT.ssc_base_url)) {
+                core.info('Existing default SSC login session found.');
+            }
             else {
                 core.setFailed('Missing credentials. Specify CI Token or Username+Password');
-                throw new Error('Credentials missing');
+                throw new Error('Credentials missing and no existing default login session exists');
             }
         }
         catch (err) {

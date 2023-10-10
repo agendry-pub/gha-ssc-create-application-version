@@ -15,6 +15,7 @@ The Action can copy the Application State and the Values from another Applicatio
     * [Create Application Version](#create-application-version)
         * [Create Application Version with Copy State and Vulns](#create-application-version-with-copy-state-and-vulns)
         * [SSC Inputs](#ssc-inputs)
+* [Environment Variables](#environment-variables)
 * [Information for Developers](#information-for-developers)
 
 ## Requirements
@@ -43,7 +44,7 @@ fortifydocker/fortify-ci-tools`. Or download the cli in you jobs:
 
 ## Usage
 
-The primary use case for this action is before the execution of a Fortify scan. See the [Fortify ScanCentral Scan](https://github.com/marketplace/actions/fortify-scancentral-scan) action for more details on how to initiate SAST scans on Fortify ScanCentral SAST. 
+The primary use case for this action is before the execution of a Fortify scan. See the [Fortify ScanCentral Scan](https://github.com/marketplace/actions/fortify-scancentral-scan) action for more details on how to initiate SAST scans on Fortify ScanCentral SAST.
 
 
 ### Create Application Version
@@ -119,7 +120,8 @@ jobs:
 *Required* The base URL for the Fortify Software Security Center instance where your data resides.
 
 **`ssc_ci_token` OR `ssc_ci_username` + `ssc_ci_password`**  
-*Required* Credentials for authenticating to Software Security Center. If both methods provided, the Action will choose the Token. Strongly recommend use of GitHub Secrets for credential management.
+*Optional* Credentials for authenticating to Software Security Center. If both methods provided, the Action will choose the Token. Strongly recommend use of GitHub Secrets for credential management. \
+If an existing and valid default session exists in the local fcli context, this default session will be used.
 
 **`ssc_app`**  
 *Required* The target SSC application name to create
@@ -135,6 +137,12 @@ jobs:
 
 **`copy_vulns`**  
 *Optional* Enable to copy vulnerabilities from source to target application version
+
+## Environment Variables
+
+**`FCLI_DEFAULT_TOKEN_EXPIRE`**  
+*Optional* Overrides default sessions token lifespan/expiration. Specifies for how long the session should remain active, for example 1h (1 hour), 1d (1 day) \
+Default: 1d
 
 ## Information for Developers
 
