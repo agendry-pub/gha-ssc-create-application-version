@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://www.github.com/agendry-pub/gha-ssc-create-application-version/compare/v1.1.0...v1.2.0) (2023-10-10)
+
+
+### Features
+
+* action will now use default login session if exists and is not expired ([288abbe](https://www.github.com/agendry-pub/gha-ssc-create-application-version/commit/288abbed1c8fcf0eccf1035c0bd3a214a1d000c6))
+
 ## [1.1.0](https://www.github.com/agendry-pub/gha-ssc-create-application-version/compare/v1.0.1...v1.1.0) (2023-10-04)
 
 
