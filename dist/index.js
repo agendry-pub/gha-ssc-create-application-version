@@ -4131,7 +4131,7 @@ async function checkLoggedIn(base_url) {
         core.debug(responseData);
         const jsonRes = JSON.parse(responseData);
         if (jsonRes.length > 0) {
-            if (jsonRes[0]['expired'] === 'No') {
+            if (jsonRes[0]['expired'] != 'Yes') {
                 return true;
             }
         }

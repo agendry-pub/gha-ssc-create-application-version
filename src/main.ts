@@ -60,7 +60,7 @@ async function checkLoggedIn(base_url: string): Promise<boolean> {
     const jsonRes = JSON.parse(responseData)
 
     if (jsonRes.length > 0) {
-      if (jsonRes[0]['expired'] === 'No') {
+      if (jsonRes[0]['expired'] != 'Yes') {
         return true
       }
     }
