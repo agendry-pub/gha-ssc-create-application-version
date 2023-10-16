@@ -27,6 +27,9 @@ inputs:
   ssc_version_attributes:
     description: 'Fortify SSC Application Version Attributes'
     required: false
+  ssc_version_issue_template:
+    description: 'Fortify SSC Application Version Issue Template'
+    required: false
   ssc_source_app:
     description: 'Fortify SSC Source Application Name to Copy State from'
     required: false

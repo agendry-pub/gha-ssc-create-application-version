@@ -19,6 +19,9 @@ const INPUT = {
   sha: core.getInput('sha', { required: false }),
   ssc_version_attributes: core.getMultilineInput('ssc_version_attributes', {
     required: false
+  }),
+  ssc_version_issue_template: core.getInput('ssc_version_issue_template', {
+    required: false
   })
 }
 
@@ -590,6 +593,59 @@ async function setAppVersionAttributes(
   return true
 }
 
+async function setAppVersionIssueTemplate(
+  appId: string,
+  template: string
+): Promise<boolean> {
+  let responseData = ''
+  let errorData = ''
+
+  const options = {
+    listeners: {
+      stdout: (data: Buffer) => {
+        responseData += data.toString()
+      },
+      stderr: (data: Buffer) => {
+        errorData += data.toString()
+      }
+    },
+    silent: true
+  }
+  try {
+    const response = await exec.exec(
+      await getExecutablePath('fcli'),
+      [
+        'ssc',
+        'appversion',
+        'update',
+        `--issue-template=${template}`,
+        `${appId}`,
+        '--output=json'
+      ],
+      options
+    )
+
+    core.debug(response.toString())
+    core.debug(responseData)
+
+    const jsonRes = JSON.parse(responseData)
+
+    if (jsonRes['__action__'] === 'UPDATED') {
+      return true
+    } else {
+      core.warning(
+        `Issue Template update failed: SSC returned __action__ = ${jsonRes['__action__']}`
+      )
+      return false
+    }
+  } catch {
+    core.error('Something went wrong during Application Attribute assignment')
+    core.error(errorData)
+
+    return false
+  }
+}
+
 async function commitAppVersion(id: string): Promise<any> {
   core.debug(`Committing AppVersion ${id}`)
 
@@ -742,7 +798,15 @@ export async function run(): Promise<void> {
         }
       }
 
+      /** ISSUE TEMPLATE : set AppVersion Issue template */
+      core.info("Setting AppVersion's Issue Template")
+      await setAppVersionIssueTemplate(
+        appVersion['id'],
+        INPUT.ssc_version_issue_template
+      )
+
       /** ATTRIBUTES : set AppVersion attributes */
+      core.info("Setting AppVersion's Attributes")
       await setAppVersionAttributes(
         appVersion['id'],
         INPUT.ssc_version_attributes

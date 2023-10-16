@@ -4098,6 +4098,9 @@ const INPUT = {
     sha: core.getInput('sha', { required: false }),
     ssc_version_attributes: core.getMultilineInput('ssc_version_attributes', {
         required: false
+    }),
+    ssc_version_issue_template: core.getInput('ssc_version_issue_template', {
+        required: false
     })
 };
 async function getExecutablePath(name) {
@@ -4561,6 +4564,46 @@ async function setAppVersionAttributes(appId, attributes) {
     }));
     return true;
 }
+async function setAppVersionIssueTemplate(appId, template) {
+    let responseData = '';
+    let errorData = '';
+    const options = {
+        listeners: {
+            stdout: (data) => {
+                responseData += data.toString();
+            },
+            stderr: (data) => {
+                errorData += data.toString();
+            }
+        },
+        silent: true
+    };
+    try {
+        const response = await exec.exec(await getExecutablePath('fcli'), [
+            'ssc',
+            'appversion',
+            'update',
+            `--issue-template=${template}`,
+            `${appId}`,
+            '--output=json'
+        ], options);
+        core.debug(response.toString());
+        core.debug(responseData);
+        const jsonRes = JSON.parse(responseData);
+        if (jsonRes['__action__'] === 'UPDATED') {
+            return true;
+        }
+        else {
+            core.warning(`Issue Template update failed: SSC returned __action__ = ${jsonRes['__action__']}`);
+            return false;
+        }
+    }
+    catch {
+        core.error('Something went wrong during Application Attribute assignment');
+        core.error(errorData);
+        return false;
+    }
+}
 async function commitAppVersion(id) {
     core.debug(`Committing AppVersion ${id}`);
     const commitBodyJson = JSON.parse(`{"committed": "true"}`);
@@ -4671,7 +4714,11 @@ async function run() {
                     core.warning(`Source AppVersion ${INPUT.ssc_source_app}:${INPUT.ssc_source_version} not found. SKIPPING`);
                 }
             }
+            /** ISSUE TEMPLATE : set AppVersion Issue template */
+            core.info("Setting AppVersion's Issue Template");
+            await setAppVersionIssueTemplate(appVersion['id'], INPUT.ssc_version_issue_template);
             /** ATTRIBUTES : set AppVersion attributes */
+            core.info("Setting AppVersion's Attributes");
             await setAppVersionAttributes(appVersion['id'], INPUT.ssc_version_attributes);
             /** COMMIT: Commit the AppVersion */
             core.info(`Committing AppVersion ${appVersion['project']['name']}:${appVersion['name']} (id: ${appVersion['id']})`);

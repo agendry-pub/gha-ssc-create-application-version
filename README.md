@@ -76,6 +76,8 @@ jobs:
             Accessibility=Internal Network Access Required
             DevStrategy=Internally Developed
             DevPhase=New
+            Interfaces=Programmatic API,Web Access
+          ssc_version_issue_template: Prioritized High Risk Issue Template
       
 ```
 
@@ -121,21 +123,21 @@ jobs:
 
 #### SSC Inputs
 
-**`ssc_url`**  
-*Required* The base URL for the Fortify Software Security Center instance where your data resides.
+**`ssc_url`**  *Required*\
+The base URL for the Fortify Software Security Center instance where your data resides.
 
-**`ssc_ci_token` OR `ssc_ci_username` + `ssc_ci_password`**  
-*Optional* Credentials for authenticating to Software Security Center. If both methods provided, the Action will choose the Token. Strongly recommend use of GitHub Secrets for credential management. \
+**`ssc_ci_token` OR `ssc_ci_username` + `ssc_ci_password`**   *Optional*\
+Credentials for authenticating to Software Security Center. If both methods provided, the Action will choose the Token. Strongly recommend use of GitHub Secrets for credential management. \
 If an existing and valid default session exists in the local fcli context, this default session will be used.
 
-**`ssc_app`**  
-*Required* The target SSC application name to create
+**`ssc_app`**  *Required*\
+The target SSC application name to create
 
-**`ssc_version`**  
-*Required* The target SSC application version name to create
+**`ssc_version`**  *Required*\
+The target SSC application version name to create
 
-**`ssc_version_attributes`**  
-*Optional* The target SSC application version attributes to be assigned. \
+**`ssc_version_attributes`**   *Optional*\
+The target SSC application version attributes to be assigned. \
 This is a multiline input using the fcli syntax for appversion-attributes updates : `fcli ssc appversion-attribute set -h`\
 List of available attributes: `fcli ssc attribute-definition list` (add `-o json`to get list of available values)
 ```yaml
@@ -148,31 +150,40 @@ ssc_version_attributes: |
 * Attributes assignment will happen after source application Copy State
 * By default, the above attributes are required when creating an application. This can be disable in SSC > Administration > Templates > Attributes
 
-**`ssc_source_app`**  
-*Optional* The source SSC application name to copy from
+**`ssc_version_issue_template`**  *Optional*\
+The target SSC application version issue template to be assigned.\
+```yaml
+ssc_version_issue_template: PCI v4.0 Basic Issue Template
+```
+**Notes**:
+* Issue template assignment will happen after source application Copy State
+* By default, an issue template is required when creating an application. However, you can define a default template in SSC > Administration > Templates > Issue Templates
 
-**`ssc_source_version`**  
-*Optional* The source SSC application version name to copy from
+**`ssc_source_app`**   *Optional*\
+The source SSC application name to copy from
 
-**`copy_vulns`**  
-*Optional* Enable to copy vulnerabilities from source to target application version
+**`ssc_source_version`**   *Optional*\
+The source SSC application version name to copy from
+
+**`copy_vulns`**   *Optional*\
+Enable to copy vulnerabilities from source to target application version
 
 ## Environment Variables
 
-**`FCLI_DEFAULT_TOKEN_EXPIRE`**  
-*Optional* Overrides default sessions token lifespan/expiration. Specifies for how long the session should remain active, for example 1h (1 hour), 1d (1 day) \
+**`FCLI_DEFAULT_TOKEN_EXPIRE`**   *Optional*\
+Overrides default sessions token lifespan/expiration. Specifies for how long the session should remain active, for example 1h (1 hour), 1d (1 day) \
 Default: 1d
 
-**`FCLI_EXECUTABLE_LOCATION`**  
-*Optional* Set the location where the fcli executable is located\
+**`FCLI_EXECUTABLE_LOCATION`**   *Optional*\
+Set the location where the fcli executable is located\
 Default: None
 
-**`FCLI_EXECUTABLE_PATH`**  
-*Optional* Set the full path to the fcli executable \
+**`FCLI_EXECUTABLE_PATH`**   *Optional*\
+Set the full path to the fcli executable \
 Default: None
 
-**`FCLI_DISABLE_SSL_CHECKS`**  
-*Optional* Disable SSL checks when fcli logs in to SSC (adds the `--insecure` to the fcli command) \
+**`FCLI_DISABLE_SSL_CHECKS`**   *Optional*\
+Disable SSL checks when fcli logs in to SSC (adds the `--insecure` to the fcli command) \
 Default: false
 
 ## Information for Developers
