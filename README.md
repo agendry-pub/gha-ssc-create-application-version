@@ -144,7 +144,9 @@ ssc_version_attributes: |
     DevStrategy=Internally Developed
     DevPhase=New
 ```
-**Note**: Attributes assignment will happen after source application Copy State
+**Notes**: 
+* Attributes assignment will happen after source application Copy State
+* By default, the above attributes are required when creating an application. This can be disable in SSC > Administration > Templates > Attributes
 
 **`ssc_source_app`**  
 *Optional* The source SSC application name to copy from
