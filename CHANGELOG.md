@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://www.github.com/agendry-pub/gha-ssc-create-application-version/compare/v1.3.1...v1.4.0) (2023-10-16)
+
+
+### Features
+
+* Issue template support added ([694c293](https://www.github.com/agendry-pub/gha-ssc-create-application-version/commit/694c293286d70017cff9e8f5a107b27ed31326ae))
+
 ### [1.3.1](https://www.github.com/agendry-pub/gha-ssc-create-application-version/compare/v1.3.0...v1.3.1) (2023-10-16)
 
 
