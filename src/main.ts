@@ -16,7 +16,20 @@ const INPUT = {
   ssc_source_app: core.getInput('ssc_source_app', { required: false }),
   ssc_source_version: core.getInput('ssc_source_version', { required: false }),
   copy_vulns: core.getBooleanInput('copy_vulns', { required: false }),
-  sha: core.getInput('sha', { required: false })
+  sha: core.getInput('sha', { required: false }),
+  ssc_version_attributes: core.getMultilineInput('ssc_version_attributes', {
+    required: false
+  })
+}
+
+async function getExecutablePath(name: string): Promise<string> {
+  if (process.env.FCLI_EXECUTABLE_PATH) {
+    return `${process.env.FCLI_EXECUTABLE_PATH.replace(/\/+$/, '')}`
+  } else if (process.env.FCLI_EXECUTABLE_LOCATION) {
+    return `${process.env.FCLI_EXECUTABLE_LOCATION.replace(/\/+$/, '')}/fcli`
+  } else {
+    return 'fcli'
+  }
 }
 
 async function checkLoggedIn(base_url: string): Promise<boolean> {
@@ -37,7 +50,7 @@ async function checkLoggedIn(base_url: string): Promise<boolean> {
 
   try {
     const response = await exec.exec(
-      'fcli',
+      await getExecutablePath('fcli'),
       ['ssc', 'session', 'list', '--query=name=default', '--output=json'],
       options
     )
@@ -78,7 +91,7 @@ async function loginToken(base_url: string, token: string): Promise<any> {
 
   try {
     const response = await exec.exec(
-      'fcli',
+      await getExecutablePath('fcli'),
       [
         'ssc',
         'session',
@@ -90,6 +103,7 @@ async function loginToken(base_url: string, token: string): Promise<any> {
         process.env.FCLI_DEFAULT_TOKEN_EXPIRE
           ? `--expire-in=${process.env.FCLI_DEFAULT_TOKEN_EXPIRE}`
           : '',
+        process.env.FCLI_DISABLE_SSL_CHECKS ? `--insecure` : '',
         '--output=json'
       ],
       options
@@ -133,7 +147,7 @@ async function loginUsernamePassword(
   }
   try {
     const response = await exec.exec(
-      'fcli',
+      await getExecutablePath('fcli'),
       [
         'ssc',
         'session',
@@ -148,6 +162,7 @@ async function loginUsernamePassword(
         process.env.FCLI_DEFAULT_TOKEN_EXPIRE
           ? process.env.FCLI_DEFAULT_TOKEN_EXPIRE
           : '1d',
+        process.env.FCLI_DISABLE_SSL_CHECKS ? `--insecure` : '',
         '--output=json'
       ],
       options
@@ -187,7 +202,7 @@ async function getAppVersionId(app: string, version: string): Promise<number> {
   }
   try {
     const response = await exec.exec(
-      'fcli',
+      await getExecutablePath('fcli'),
       [
         'ssc',
         'appversion',
@@ -238,7 +253,7 @@ async function getAppId(app: string): Promise<number> {
   }
   try {
     const response = await exec.exec(
-      'fcli',
+      await getExecutablePath('fcli'),
       ['ssc', 'app', 'ls', `-q=name=${app}`, '--output=json'],
       options
     )
@@ -295,7 +310,7 @@ async function createAppVersion(app: any, version: string): Promise<any> {
   }
   try {
     const response = await exec.exec(
-      'fcli',
+      await getExecutablePath('fcli'),
       [
         'ssc',
         'rest',
@@ -332,6 +347,61 @@ async function createAppVersion(app: any, version: string): Promise<any> {
   }
 }
 
+async function deleteAppVersion(id: any): Promise<boolean> {
+  core.debug(`Deleting AppVersion ${id}`)
+
+  let responseData = ''
+  let errorData = ''
+
+  const options = {
+    listeners: {
+      stdout: (data: Buffer) => {
+        responseData += data.toString()
+      },
+      stderr: (data: Buffer) => {
+        errorData += data.toString()
+      }
+    },
+    silent: true
+  }
+  try {
+    const response = await exec.exec(
+      await getExecutablePath('fcli'),
+      [
+        'ssc',
+        'rest',
+        'call',
+        `/api/v1/projectVersions/${id}`,
+        `-X`,
+        'DELETE',
+        '--output=json'
+      ],
+      options
+    )
+
+    core.debug(response.toString())
+    core.debug(responseData)
+
+    const jsonRes = JSON.parse(responseData)
+    const responseCode = jsonRes[0].responseCode
+    core.debug(responseCode)
+
+    if (200 <= Number(responseCode) && Number(responseCode) < 300) {
+      return true
+    } else {
+      core.error(`AppVersion Deletion failed with code ${responseCode}`)
+      throw new Error(`AppVersion Commit Deletion with code ${responseCode}`)
+    }
+  } catch {
+    core.error('Something went wrong during Application Version Deletion')
+    core.error(errorData)
+    core.error(`AppVersion ${id}`)
+    core.setFailed('Something went wrong during Application Version Deletion')
+  }
+
+  return false
+}
+
 async function copyAppVersionState(
   source: string,
   target: string
@@ -357,7 +427,7 @@ async function copyAppVersionState(
   }
   try {
     const response = await exec.exec(
-      'fcli',
+      await getExecutablePath('fcli'),
       [
         'ssc',
         'rest',
@@ -420,7 +490,7 @@ async function copyAppVersionVulns(
   }
   try {
     const response = await exec.exec(
-      'fcli',
+      await getExecutablePath('fcli'),
       [
         'ssc',
         'rest',
@@ -458,6 +528,68 @@ async function copyAppVersionVulns(
   }
 }
 
+async function setAppVersionAttribute(
+  appId: string,
+  attribute: string
+): Promise<boolean> {
+  let responseData = ''
+  let errorData = ''
+
+  const options = {
+    listeners: {
+      stdout: (data: Buffer) => {
+        responseData += data.toString()
+      },
+      stderr: (data: Buffer) => {
+        errorData += data.toString()
+      }
+    },
+    silent: true
+  }
+  try {
+    const response = await exec.exec(
+      await getExecutablePath('fcli'),
+      [
+        'ssc',
+        'appversion-attribute',
+        'set',
+        attribute,
+        `--appversion=${appId}`,
+        '--output=json'
+      ],
+      options
+    )
+
+    core.debug(response.toString())
+
+    return true
+  } catch {
+    core.error('Something went wrong during Application Attribute assignment')
+    core.error(errorData)
+
+    return false
+  }
+}
+
+async function setAppVersionAttributes(
+  appId: string,
+  attributes: string[]
+): Promise<boolean> {
+  await Promise.all(
+    attributes.map(async attribute => {
+      core.debug(`Assigning ${attribute} to ${appId}`)
+      let status = await setAppVersionAttribute(appId, attribute)
+      core.debug(`Assigned = ${status}`)
+      if (!status) {
+        core.warning(`Attribute assignment failed: ${attribute}`)
+        return false
+      }
+    })
+  )
+
+  return true
+}
+
 async function commitAppVersion(id: string): Promise<any> {
   core.debug(`Committing AppVersion ${id}`)
 
@@ -480,7 +612,7 @@ async function commitAppVersion(id: string): Promise<any> {
   }
   try {
     const response = await exec.exec(
-      'fcli',
+      await getExecutablePath('fcli'),
       [
         'ssc',
         'rest',
@@ -524,8 +656,8 @@ async function commitAppVersion(id: string): Promise<any> {
  */
 export async function run(): Promise<void> {
   try {
-    /** Login  */
     try {
+      /** Login  */
       core.info(`Login to Fortify Software Security Center`)
       if (INPUT.ssc_ci_token) {
         await loginToken(INPUT.ssc_base_url, INPUT.ssc_ci_token)
@@ -562,7 +694,7 @@ export async function run(): Promise<void> {
       )
       core.info(`Skipping`)
     } else {
-      /** AppVersion CREATION*/
+      /** CREATION: AppVersion */
       core.info(`AppVersion ${INPUT.ssc_app}:${INPUT.ssc_version} not found`)
       core.info(
         `Creating ApplicationVersion ${INPUT.ssc_app}:${INPUT.ssc_version}`
@@ -575,7 +707,7 @@ export async function run(): Promise<void> {
         `AppVersion ${appVersion['project']['name']}:${appVersion['name']} created (id: ${appVersion['id']})`
       )
 
-      /** AppVersion COPY STATE */
+      /** COPY STATE: run the AppVersion Copy  */
       let sourceAppVersionId
       if (INPUT.ssc_source_app && INPUT.ssc_source_version) {
         core.info(
@@ -610,7 +742,13 @@ export async function run(): Promise<void> {
         }
       }
 
-      /** AppVersion COMMIT */
+      /** ATTRIBUTES : set AppVersion attributes */
+      await setAppVersionAttributes(
+        appVersion['id'],
+        INPUT.ssc_version_attributes
+      )
+
+      /** COMMIT: Commit the AppVersion */
       core.info(
         `Committing AppVersion ${appVersion['project']['name']}:${appVersion['name']} (id: ${appVersion['id']})`
       )
@@ -622,12 +760,14 @@ export async function run(): Promise<void> {
         core.error(
           `FAILURE: Committing AppVersion ${appVersion['project']['name']}:${appVersion['name']} (id: ${appVersion['id']})`
         )
+        /** delete uncommited AppVersion */
+        await deleteAppVersion(appVersion['id'])
         throw new Error(
           `Failed to commit AppVersion ${appVersion['project']['name']}:${appVersion['name']} (id: ${appVersion['id']})`
         )
       }
 
-      /** AppVersion Copy vulns */
+      /** COPY VULNS: run the AppVersion Copy vulns */
       if (INPUT.copy_vulns && sourceAppVersionId) {
         core.info(
           `Copying Vulnerabilities from ${INPUT.ssc_source_app}:${INPUT.ssc_source_version} to ${INPUT.ssc_app}:${INPUT.ssc_version}`

@@ -49,7 +49,8 @@ The primary use case for this action is before the execution of a Fortify scan. 
 
 ### Create Application Version
 
-This example workflow demonstrates how to create an application version in SSC, using the repo and branch names as app:version
+This example workflow demonstrates how to create an application version in SSC, using the repo and branch names as app:version \
+The required ApplicationVersion's Attributes can be specified using `ssc_version_attributes`
 
 ```yaml
 name: (FTFY) Create Application Version
@@ -71,6 +72,10 @@ jobs:
           ssc_ci_token: ${{ secrets.FTFY_CI_TOKEN_DEC }}
           ssc_app: ${{ github.event.repository.name }}
           ssc_version: ${{ github.ref_name }}
+          ssc_version_attributes: |
+            Accessibility=Internal Network Access Required
+            DevStrategy=Internally Developed
+            DevPhase=New
       
 ```
 
@@ -129,6 +134,18 @@ If an existing and valid default session exists in the local fcli context, this 
 **`ssc_version`**  
 *Required* The target SSC application version name to create
 
+**`ssc_version_attributes`**  
+*Optional* The target SSC application version attributes to be assigned. \
+This is a multiline input using the fcli syntax for appversion-attributes updates : `fcli ssc appversion-attribute set -h`\
+List of available attributes: `fcli ssc attribute-definition list` (add `-o json`to get list of available values)
+```yaml
+ssc_version_attributes: |
+    Accessibility=Internal Network Access Required
+    DevStrategy=Internally Developed
+    DevPhase=New
+```
+**Note**: Attributes assignment will happen after source application Copy State
+
 **`ssc_source_app`**  
 *Optional* The source SSC application name to copy from
 
@@ -143,6 +160,18 @@ If an existing and valid default session exists in the local fcli context, this 
 **`FCLI_DEFAULT_TOKEN_EXPIRE`**  
 *Optional* Overrides default sessions token lifespan/expiration. Specifies for how long the session should remain active, for example 1h (1 hour), 1d (1 day) \
 Default: 1d
+
+**`FCLI_EXECUTABLE_LOCATION`**  
+*Optional* Set the location where the fcli executable is located\
+Default: None
+
+**`FCLI_EXECUTABLE_PATH`**  
+*Optional* Set the full path to the fcli executable \
+Default: None
+
+**`FCLI_DISABLE_SSL_CHECKS`**  
+*Optional* Disable SSL checks when fcli logs in to SSC (adds the `--insecure` to the fcli command) \
+Default: false
 
 ## Information for Developers
 
