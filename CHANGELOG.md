@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.3.1](https://www.github.com/agendry-pub/gha-ssc-create-application-version/compare/v1.3.0...v1.3.1) (2023-10-16)
+
+
+### Bug Fixes
+
+* use existing ssc session when created using tokens (Expired = Unknown) ([20a9c6e](https://www.github.com/agendry-pub/gha-ssc-create-application-version/commit/20a9c6e079aa837d768a827dc28b4590768cd07d))
+
 ## [1.3.0](https://www.github.com/agendry-pub/gha-ssc-create-application-version/compare/v1.2.0...v1.3.0) (2023-10-16)
 
 
