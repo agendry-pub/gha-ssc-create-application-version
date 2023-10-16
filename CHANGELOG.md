@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.3.0](https://www.github.com/agendry-pub/gha-ssc-create-application-version/compare/v1.2.0...v1.3.0) (2023-10-16)
+
+
+### Features
+
+* Attributes assignment support ([4db1016](https://www.github.com/agendry-pub/gha-ssc-create-application-version/commit/4db1016f4f1afa876214c5a0ef5a3961fe3195ea))
+* Disable SSL checks support ([4db1016](https://www.github.com/agendry-pub/gha-ssc-create-application-version/commit/4db1016f4f1afa876214c5a0ef5a3961fe3195ea))
+* Executable path set through env variables ([4db1016](https://www.github.com/agendry-pub/gha-ssc-create-application-version/commit/4db1016f4f1afa876214c5a0ef5a3961fe3195ea))
+
 ## [1.2.0](https://www.github.com/agendry-pub/gha-ssc-create-application-version/compare/v1.1.0...v1.2.0) (2023-10-10)
 
 
