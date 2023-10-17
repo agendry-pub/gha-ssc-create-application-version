@@ -1,7 +1,7 @@
 {
   "name": "gha-ssc-create-application-version",
   "description": "GitHub Actions to create Application Version in SSC",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "author": "Alex Gendry",
   "private": false,
   "homepage": "https://github.com/agendry-pub/gha-ssc-create-application-version",
