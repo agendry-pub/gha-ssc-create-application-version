@@ -93,22 +93,23 @@ async function loginToken(base_url: string, token: string): Promise<any> {
   }
 
   try {
+    let args = [
+      'ssc',
+      'session',
+      'login',
+      `--url=${base_url}`,
+      `--ci-token=${token}`,
+      '--output=json'
+    ]
+    args = process.env.FCLI_DEFAULT_TOKEN_EXPIRE
+      ? args.concat([`--expire-in=${process.env.FCLI_DEFAULT_TOKEN_EXPIRE}`])
+      : args
+    args = process.env.FCLI_DISABLE_SSL_CHECKS
+      ? args.concat([`--insecure`])
+      : args
     const response = await exec.exec(
       await getExecutablePath('fcli'),
-      [
-        'ssc',
-        'session',
-        'login',
-        `--url`,
-        base_url,
-        '-t',
-        token,
-        process.env.FCLI_DEFAULT_TOKEN_EXPIRE
-          ? `--expire-in=${process.env.FCLI_DEFAULT_TOKEN_EXPIRE}`
-          : '',
-        process.env.FCLI_DISABLE_SSL_CHECKS ? `--insecure` : '',
-        '--output=json'
-      ],
+      args,
       options
     )
     core.debug(response.toString())
@@ -149,25 +150,28 @@ async function loginUsernamePassword(
     silent: true
   }
   try {
+    let args = [
+      'ssc',
+      'session',
+      'login',
+      `--url`,
+      base_url,
+      '-u',
+      username,
+      '-p',
+      password,
+      '--output=json'
+    ]
+    args = process.env.FCLI_DEFAULT_TOKEN_EXPIRE
+      ? args.concat([`--expire-in=${process.env.FCLI_DEFAULT_TOKEN_EXPIRE}`])
+      : args
+    args = process.env.FCLI_DISABLE_SSL_CHECKS
+      ? args.concat([`--insecure`])
+      : args
+    core.debug(args.toString())
     const response = await exec.exec(
       await getExecutablePath('fcli'),
-      [
-        'ssc',
-        'session',
-        'login',
-        `--url`,
-        base_url,
-        '-u',
-        username,
-        '-p',
-        password,
-        '--expire-in',
-        process.env.FCLI_DEFAULT_TOKEN_EXPIRE
-          ? process.env.FCLI_DEFAULT_TOKEN_EXPIRE
-          : '1d',
-        process.env.FCLI_DISABLE_SSL_CHECKS ? `--insecure` : '',
-        '--output=json'
-      ],
+      args,
       options
     )
     core.debug(response.toString())
@@ -716,8 +720,10 @@ export async function run(): Promise<void> {
       /** Login  */
       core.info(`Login to Fortify Software Security Center`)
       if (INPUT.ssc_ci_token) {
+        core.debug('Login with token')
         await loginToken(INPUT.ssc_base_url, INPUT.ssc_ci_token)
       } else if (INPUT.ssc_ci_username && INPUT.ssc_ci_password) {
+        core.debug('Login with username password')
         await loginUsernamePassword(
           INPUT.ssc_base_url,
           INPUT.ssc_ci_username,
