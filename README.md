@@ -172,7 +172,8 @@ Enable to copy vulnerabilities from source to target application version
 
 **`FCLI_DEFAULT_TOKEN_EXPIRE`**   *Optional*\
 Overrides default sessions token lifespan/expiration. Specifies for how long the session should remain active, for example 1h (1 hour), 1d (1 day) \
-Default: 1d
+Default: 1d\
+**Note**: Only apply to Username/Password logins
 
 **`FCLI_EXECUTABLE_LOCATION`**   *Optional*\
 Set the location where the fcli executable is located\

@@ -101,9 +101,6 @@ async function loginToken(base_url: string, token: string): Promise<any> {
       `--ci-token=${token}`,
       '--output=json'
     ]
-    args = process.env.FCLI_DEFAULT_TOKEN_EXPIRE
-      ? args.concat([`--expire-in=${process.env.FCLI_DEFAULT_TOKEN_EXPIRE}`])
-      : args
     args = process.env.FCLI_DISABLE_SSL_CHECKS
       ? args.concat([`--insecure`])
       : args
