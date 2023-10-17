@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.4.1](https://www.github.com/agendry-pub/gha-ssc-create-application-version/compare/v1.4.0...v1.4.1) (2023-10-17)
+
+
+### Bug Fixes
+
+* login failed when token expire or disable SSL weren't provided ([913aa06](https://www.github.com/agendry-pub/gha-ssc-create-application-version/commit/913aa064f38e50908191993d0a05d5025eada2e6))
+
 ## [1.4.0](https://www.github.com/agendry-pub/gha-ssc-create-application-version/compare/v1.3.1...v1.4.0) (2023-10-16)
 
 
