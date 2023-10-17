@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.4.2](https://www.github.com/agendry-pub/gha-ssc-create-application-version/compare/v1.4.1...v1.4.2) (2023-10-17)
+
+
+### Bug Fixes
+
+* expire-in only with UsernamePassword ([20c4686](https://www.github.com/agendry-pub/gha-ssc-create-application-version/commit/20c4686f3a78925d967a465442b84b32bce4c1d5))
+
 ### [1.4.1](https://www.github.com/agendry-pub/gha-ssc-create-application-version/compare/v1.4.0...v1.4.1) (2023-10-17)
 
 
